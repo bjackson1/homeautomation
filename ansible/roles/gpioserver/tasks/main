@@ -1,0 +1,16 @@
+---
+- name: Clone HomeAutomation repo
+  git: repo=https://github.com/bjackson1/homeautomation.git dest=/home/pi/homeautomation force=yes
+
+- name: Install Flask
+  pip: name=Flask state=present
+
+- name: Create GPIOServer service (1)
+  template: src=gpioserver mode=0755 dest=/etc/init.d/gpioserver
+
+- name: Create GPIOServer service (2)
+  shell: sudo update-rc.d gpioserver defaults
+
+- name: Start GPIOServer
+  service: name=gpioserver state=started enabled=yes
+

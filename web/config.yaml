@@ -24,23 +24,4 @@ controls:
     gpio: 21
     friendlyname: Landing Light
 
-cards:
-  card1:
-    host: 192.168.1.12
-    id: 4294967408
-    gpio:
-      power: 2
-      switch: 3
-      powerled: 23
-      cardled: 24
-  card2:
-    gpio:
-      power: 4
-      switch: 14
-  card3:
-    gpio:
-      power: 15
-      switch: 18
-      powerled: 7
-      cardled: 8
 
