@@ -1,0 +1,65 @@
+body {
+  background-color: white;
+  font-family: Verdana;
+  font-size: 150%;
+  margin: 0;
+  padding: 0;
+  left-padding: 30px;
+}
+
+h1 {
+  font-size: 200%;
+}
+
+.headerbar {
+  background-color: black;
+  color: white;
+  height: 120px;
+  padding-left: 50px;
+  font-size: 250%;
+  font-weight: bold;
+}
+
+.shadowbar {
+  height: 4px !important;
+  background-color: lightgrey;
+  max-height: 4px;
+}
+
+.temperaturelabel {
+  font-size: 125%;
+  padding-left: 50px;
+  padding-right: 25px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.temperaturereadinghigh {
+  font-size: 250%;
+  color: darkred;
+  font-weight: bold;
+}
+
+.temperaturereadingmedium {
+  font-size: 250%;
+  color: darkorange;
+  font-weight: bold;
+  padding-left: 50px;
+}
+
+.temperaturereadinglow {
+  font-size: 250%;
+  color: blue;
+  font-weight: bold;
+}
+
+.controllabel {
+  font-size: 125%;
+  padding-left: 50px;
+  padding-right: 25px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.controlbutton {
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Home Control</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}" />
+<script src="{{ url_for('static', filename='lib.js') }}"></script>
+</head>
+
+<body>
+<table border=0 cellspacing=0 cellpadding=10 width=100%>
+<tr><td class="headerbar">
+
+Home Control
+
+</td></tr>
+
+
+
+<!--tr class="shadowbar"><td class="shadowbar"></td></tr-->
+
+<tr><td>
+
+<h1>Temperature</h1>
+
+<table border=0 cellspacing=0 cellpadding=5>
+
+{% for sensor in sensors %}
+<tr>
+<td class="temperaturelabel">{{ sensors[sensor].friendlyname }}</td>
+<td class="temperaturereading{% if sensors[sensor].reading|int < 18 %}low{% elif sensors[sensor].reading|int < 20 %}medium{% else %}high{% endif %}">{{ sensors[sensor].reading|float|round(1) }}°C</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<br />
+<h1>Control</h1>
+
+<table border=0 cellspacing=0 cellpadding=5>
+
+{% for control in controls %}
+<tr>
+<td class="controllabel"><b>{{ controls[control].friendlyname }}</b></td>
+<td class="controlbutton"><a href="#!" id="lnk{{ control }}" onclick="setControlState('{{ control }}', '{% if controls[control].state == '1' %}off{% else %}on{% endif %}')"><img src="{{ url_for('static', filename = 'power_button_' + controls[control].state + '.png') }}" id="btn{{ control }}" height=150 width=150></img></a></td>
+</tr>
+{% endfor %}
+
+
+</table>
+
+
+</td></tr></table>
+</body>
+</html>
