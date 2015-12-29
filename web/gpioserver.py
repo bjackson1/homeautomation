@@ -10,6 +10,7 @@ import socket
 import fcntl
 import struct
 import os
+import time
 
 
 SCRIPTPATH=os.path.dirname(os.path.realpath(__file__))
@@ -124,6 +125,25 @@ def setcontrolstate(control, state):
 
 
   return newstate
+
+@app.route('/switch')
+def switch():
+  gpio.setmode(gpio.BCM)
+  gpio.setup(17, gpio.IN)
+
+  while True:
+    gpio.wait_for_edge(17, gpio.FALLING)
+    print "Button 17 pressed"
+    time.sleep(0.25)
+
+  while True:
+    if gpio.input(17) == False:
+      print "GPIO button 17 pressed"
+
+    time.sleep(0.1)
+
+  return True
+
 
 
 if __name__ == '__main__':
