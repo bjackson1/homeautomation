@@ -3,6 +3,9 @@
 from flask import Flask
 from flask import request
 from flask import render_template
+from socket import gethostname
+from threading import Thread
+
 import RPi.GPIO as gpio
 import yaml
 import urllib2
@@ -126,27 +129,48 @@ def setcontrolstate(control, state):
 
   return newstate
 
-@app.route('/switch')
-def switch():
+@app.route('/togglecontrol/<control>')
+def togglecontrol(control):
+  currentstate = getcontrolstate(control)
+  print currentstate
+  if currentstate == '0':
+    newstate = 'on'
+  else:
+    newstate = 'off'
+
+  setnewstate = setcontrolstate(control, newstate)
+  print setnewstate
+
+  return newstate
+
+
+def switchworker(gpioid, control):
   gpio.setmode(gpio.BCM)
-  gpio.setup(17, gpio.IN)
+  gpio.setup(gpioid, gpio.IN)
 
   while True:
-    gpio.wait_for_edge(17, gpio.FALLING)
-    print "Button 17 pressed"
+    gpio.wait_for_edge(gpioid, gpio.FALLING)
+    print "Button " + str(gpioid) + " for " + control + " pressed"
+    togglecontrol(control)
     time.sleep(0.25)
-
-  while True:
-    if gpio.input(17) == False:
-      print "GPIO button 17 pressed"
-
-    time.sleep(0.1)
 
   return True
 
 
+def createswitchworkers():
+  gpio.setmode(gpio.BCM)
+
+  switches = config['switches']
+
+  if gethostname() in switches['hosts']:
+    hostswitches = switches['hosts'][gethostname()]
+    for sw in hostswitches:
+      t = Thread(target = switchworker, args = (hostswitches[sw]['gpio'], hostswitches[sw]['control']))
+      t.start()
+      print "Switch worker thread started for " + hostswitches[sw]['control']
+
 
 if __name__ == '__main__':
+  createswitchworkers()
   app.run(debug=True, host='0.0.0.0', threaded=True)
-
 
