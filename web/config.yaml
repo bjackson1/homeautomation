@@ -24,4 +24,15 @@ controls:
     gpio: 21
     friendlyname: Landing Light
 
+switches:
+  hosts:
+    testpi:
+      testswitch:
+        gpio: 17
+        control: landinglight
+      testswitch2:
+        gpio: 18
+        control: testlight2
+
+
 
