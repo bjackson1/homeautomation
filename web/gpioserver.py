@@ -26,15 +26,18 @@ app = Flask(__name__)
 
 @app.route('/temp/<room>')
 def temp(room):
-  dataFilePath = '/sys/bus/w1/devices/' + config['tempsensors'][room]['id'] + '/w1_slave'
-  datafile = open(dataFilePath)
-  data = datafile.read()
-  datafile.close()
+  try:
+    dataFilePath = '/sys/bus/w1/devices/' + config['tempsensors'][room]['id'] + '/w1_slave'
+    datafile = open(dataFilePath)
+    data = datafile.read()
+    datafile.close()
+    tempdata = data.split("\n")[1].split(" ")[9]
+    temp = float(tempdata[2:])
+    temp = temp / 1000
+    print 'Temperature reading: ' + str(temp)
+  except:
+    temp = "Unavailable"
 
-  tempdata = data.split("\n")[1].split(" ")[9]
-  temp = float(tempdata[2:])
-  temp = temp / 1000
-  print 'Temperature reading: ' + str(temp)
   return render_template('temperature_bare', temperature=temp)
 
 @app.route('/')

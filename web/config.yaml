@@ -1,9 +1,29 @@
 ---
 tempsensors:
-  understairs:
-    host: 192.168.1.12
+  loft:
+    host: 192.168.1.2
     id: 28-00145311e6ff
-    friendlyname: Under the Stairs
+    friendlyname: Loft
+  hotwaterflow:
+    host: 192.168.1.12
+    id: 28-0315a1b006ff
+    friendlyname: Hot Water Flow
+  hotwaterreturn:
+    host: 192.168.1.12
+    id: 28-0315a1d21dff
+    friendlyname: Hot Water Return
+  heatingflow:
+    host: 192.168.1.12
+    id: 28-0315a1b011ff
+    friendlyname: Central Heating Flow
+  heatingreturn:
+    host: 192.168.1.12
+    id: 28-0315a1b026ff
+    friendlyname: Central Heating Return
+  livingroom:
+    host: 192.168.1.12
+    id: 28-0415a187aaff
+    friendlyname: Living Room
 
 controls:
   hotwater:
