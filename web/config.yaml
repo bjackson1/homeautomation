@@ -2,7 +2,7 @@
 tempsensors:
   loft:
     host: 192.168.1.2
-    id: 28-00145311e6ff
+    id: 28-0315a1d259ff
     friendlyname: Loft
   hotwaterflow:
     host: 192.168.1.12

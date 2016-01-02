@@ -2,6 +2,9 @@
 - name: Set hostname
   hostname: name={{ hostvars[inventory_hostname]['hostname'] }}
 
+- name: Update hostname in hosts
+  lineinfile: dest=/etc/hosts state=present regexp=127.*raspberrypi line='127.0.1.1\t{{ hostvars[inventory_hostname]['hostname'] }}'
+
 - name: Install vim
   apt: name=vim state=present
 
@@ -19,4 +22,14 @@
 
 - name: Install PyYAML
   pip: name=pyyaml state=present
+
+- name: Enable Temperature Sensor in /boot/config.txt
+  lineinfile: dest=/boot/config.txt state=present regexp='dtoverlay=w1-gpio' line='dtoverlay=w1-gpio'
+
+- name: Modprobe w1-gpio
+  shell: modprobe w1-gpio
+
+- name: Modprobe w1-therm
+  shell: modprobe w1-therm
+
 
