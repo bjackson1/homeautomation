@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ### BEGIN INIT INFO
 # Provides:          myservice
@@ -34,7 +34,14 @@ do_start () {
 }
 do_stop () {
     log_daemon_msg "Stopping system $DAEMON_NAME daemon"
-    start-stop-daemon --stop --pidfile $PIDFILE --retry 10
+    set PID=`ps -ef|grep '[p]ython /home/pi/homeautomation/web/gpioserver.py' | awk '{ print $2 }'`
+
+    for pid in $PID
+    do
+      echo "Stopping process" + $pid + "..."
+      kill $pid
+    done
+
     log_end_msg $?
 }
 
