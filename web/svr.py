@@ -6,7 +6,7 @@ from flask import render_template
 from socket import gethostname
 from threading import Thread
 
-import RPi.GPIO as gpio
+from hwcontrol import temperature
 import yaml
 import urllib2
 import socket
@@ -27,13 +27,7 @@ app = Flask(__name__)
 @app.route('/temp/<room>')
 def temp(room):
   try:
-    dataFilePath = '/sys/bus/w1/devices/' + config['tempsensors'][room]['id'] + '/w1_slave'
-    datafile = open(dataFilePath)
-    data = datafile.read()
-    datafile.close()
-    tempdata = data.split("\n")[1].split(" ")[9]
-    temp = float(tempdata[2:])
-    temp = temp / 1000
+    temp = temperature().get(config['tempsensors'][room]['id']) 
     print 'Temperature reading: ' + str(temp)
   except:
     temp = "Unavailable"
@@ -174,6 +168,6 @@ def createswitchworkers():
 
 
 if __name__ == '__main__':
-  createswitchworkers()
+#  createswitchworkers()
   app.run(debug=True, host='0.0.0.0', threaded=True)
 

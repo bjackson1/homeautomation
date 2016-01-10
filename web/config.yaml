@@ -24,6 +24,10 @@ tempsensors:
     host: 192.168.1.12
     id: 28-0415a187aaff
     friendlyname: Living Room
+  test:
+    host: localhost
+    id: 28-0315a1d297ff
+    friendlyname: Test Probe
 
 controls:
   hotwater:
