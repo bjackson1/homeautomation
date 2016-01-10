@@ -34,16 +34,18 @@ do_start () {
 }
 do_stop () {
     log_daemon_msg "Stopping system $DAEMON_NAME daemon"
-    set PID=`ps -ef|grep '[p]ython /home/pi/homeautomation/web/gpioserver.py' | awk '{ print $2 }'`
+    read py1 py2 <<< $(ps -ef|grep '[p]ython /home/pi/homeautomation/web/gpioserver.py' | awk '{ print $2 }')
 
-    for pid in $PID
-    do
-      echo "Stopping process" + $pid + "..."
-      kill $pid
-    done
+    echo Stopping process $py1...
+    kill $py1
+
+    echo Stopping process $py2...
+    kill $py2
 
     log_end_msg $?
 }
+
+echo "njknjk"
 
 case "$1" in
 
