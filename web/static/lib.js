@@ -1,5 +1,7 @@
 
 function setControlState(control, state) {
+  var btn = document.getElementById("btn" + control);
+  btn.src = '/static/spinner.gif';
   var xhttp = new XMLHttpRequest();
   var newstate = 'on'
   if (state == 'on') { 
