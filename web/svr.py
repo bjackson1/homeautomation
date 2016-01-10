@@ -6,7 +6,7 @@ from flask import render_template
 from socket import gethostname
 from threading import Thread
 
-from hwcontrol import temperature
+from hwcontrol import temperature, pins
 import yaml
 import urllib2
 import socket
@@ -19,13 +19,23 @@ import time
 SCRIPTPATH=os.path.dirname(os.path.realpath(__file__))
 MOBILETMPL="main.mobile.html"
 
-cfgstream = file(SCRIPTPATH + '/config.yaml')
-config = yaml.load(cfgstream)
 
 app = Flask(__name__)
 
+
+def loadconfig():
+  cfgstream = file(SCRIPTPATH + '/config.yaml')
+  config = yaml.load(cfgstream)
+  return config
+
+def getfromurl(url):
+  ret = urllib2.urlopen(url).read()
+  return ret
+
+
 @app.route('/temp/<room>')
 def temp(room):
+  config = loadconfig()
   try:
     temp = temperature().get(config['tempsensors'][room]['id']) 
     print 'Temperature reading: ' + str(temp)
@@ -37,6 +47,7 @@ def temp(room):
 @app.route('/')
 def alltemp():
   #room = 'understairs'
+  config = loadconfig()
 
   for room in config['tempsensors']:
     sensorcfg = config['tempsensors'][room]
@@ -60,23 +71,25 @@ def alltemp():
 
 @app.route('/gpio/<id>')
 def getgpiostate(id):
-  gpio.setmode(gpio.BCM)
-
-  gpionum = int(id)
-  gpio.setup(gpionum, gpio.OUT)
-  return str(gpio.input(gpionum))
+  #gpio.setmode(gpio.BCM)
+  #gpionum = int(id)
+  #gpio.setup(gpionum, gpio.OUT)
+  #return str(gpio.input(gpionum))
+  return str(pins().getpin(id))
 
 @app.route('/gpio/<id>/<state>')
 def setgpiostate(id, state):
-  gpio.setmode(gpio.BCM)
-  gpionum = int(id)
-  gpio.setup(gpionum, gpio.OUT)
-  gpio.output(gpionum, True if state == 'on' else False)
-  return getgpiostate(id)
-  
+  #gpio.setmode(gpio.BCM)
+  #gpionum = int(id)
+  #gpio.setup(gpionum, gpio.OUT)
+  #gpio.output(gpionum, True if state == 'on' else False)
+  #return getgpiostate(id)
+  pins().setpin(id, state)
+  return str(pins().getpin(id))
 
 @app.route('/control/<control>')
 def getcontrolstate(control):
+  config = loadconfig()
   control = config['controls'][control]
   host = control['host']
 
@@ -84,7 +97,8 @@ def getcontrolstate(control):
   if 'reversed' in control:
     reversed = True
 
-  state = urllib2.urlopen('http://' + host + ':5000/gpio/' + str(control['gpio'])).read()
+  stateurl = 'http://' + host + ':5000/gpio/' + str(control['gpio'])
+  state = urllib2.urlopen(stateurl).read()
 
   if reversed == True:
     if state == '1':
@@ -96,16 +110,17 @@ def getcontrolstate(control):
 
 @app.route('/control/<control>/<state>')
 def setcontrolstate(control, state):
+  config = loadconfig()
   control = config['controls'][control]
   host = control['host']
 
   if 'statusgpio' in control:
-    urllib2.urlopen('http://' + host + ':5000/gpio/' + str(control['statusgpio']) + '/' + state)
+    statusledurl = 'http://' + host + ':5000/gpio/' + str(control['statusgpio']) + '/' + state
+    getfromurl(statusledurl)
 
   if 'dependsupon' in control: # and state == 'on':
     setcontrolstate(control['dependsupon'], state)
 
-  print state
 
   reversed = False
   if 'reversed' in control:
@@ -115,7 +130,8 @@ def setcontrolstate(control, state):
     else:
       state = 'on'
 
-  newstate = urllib2.urlopen('http://' + host + ':5000/gpio/' + str(control['gpio']) + '/' + state).read()
+  stateurl = 'http://' + host + ':5000/gpio/' + str(control['gpio']) + '/' + state
+  newstate = getfromurl(stateurl)
 
   if reversed == True:
     if newstate == '1':
@@ -155,6 +171,7 @@ def switchworker(gpioid, control):
 
 
 def createswitchworkers():
+  config = loadconfig()
   gpio.setmode(gpio.BCM)
 
   switches = config['switches']
