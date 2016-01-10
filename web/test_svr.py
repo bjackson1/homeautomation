@@ -72,6 +72,16 @@ class svr_loadconfig(unittest.TestCase):
       mock_getfromurl.assert_any_call(expectedurl2)
       #self.assertEqual(1, 1)
 
+  def test_svr_togglecontrol_WhenCalledWithControlInOnState_WillSetControlToOff(self):
+    with mock.patch('svr.loadconfig', return_value=self.testconfig1), mock.patch('svr.getcontrolstate', return_value='1') as mock_getcontrolstate, mock.patch('svr.setcontrolstate') as mock_setcontrolstate:
+      svr.togglecontrol('hotwater')
+      mock_setcontrolstate.assert_called_with('hotwater', 'off')
+      
+  def test_svr_togglecontrol_WhenCalledWithControlInOffState_WillSetControlToOn(self):
+    with mock.patch('svr.loadconfig', return_value=self.testconfig1), mock.patch('svr.getcontrolstate', return_value='0') as mock_getcontrolstate, mock.patch('svr.setcontrolstate') as mock_setcontrolstate:
+      svr.togglecontrol('hotwater')
+      mock_setcontrolstate.assert_called_with('hotwater', 'on')
+      
 
 class hwcontrol_pin_tests(unittest.TestCase):
   def test_hwcontrol_pins_getpin_WhenCalledWithAnyPinNumberAndMockedHigh_ReturnsTrue(self):

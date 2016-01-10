@@ -125,35 +125,21 @@ def setcontrolstate(control, state):
   reversed = False
   if 'reversed' in control:
     reversed = True
-    if state == 'on':
-      state = 'off'
-    else:
-      state = 'on'
+    state = 'off' if state == 'on' else 'on'
 
   stateurl = 'http://' + host + ':5000/gpio/' + str(control['gpio']) + '/' + state
   newstate = getfromurl(stateurl)
 
   if reversed == True:
-    if newstate == '1':
-      newstate = '0'
-    else:
-      newstate = '1'
-
+    newstate = '0' if newstate == '1' else '1'
 
   return newstate
 
 @app.route('/togglecontrol/<control>')
 def togglecontrol(control):
   currentstate = getcontrolstate(control)
-  print currentstate
-  if currentstate == '0':
-    newstate = 'on'
-  else:
-    newstate = 'off'
-
-  setnewstate = setcontrolstate(control, newstate)
-  print setnewstate
-
+  newstate = 'on' if currentstate == '0' else 'off'
+  setcontrolstate(control, newstate)
   return newstate
 
 
