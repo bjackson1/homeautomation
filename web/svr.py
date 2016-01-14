@@ -8,37 +8,44 @@ from threading import Thread
 
 from hwcontrol import temperature, pins
 import yaml
-import urllib2
+import urllib.request
 import socket
 import fcntl
 import struct
 import os
 import time
-
+import redis
 
 SCRIPTPATH=os.path.dirname(os.path.realpath(__file__))
 MOBILETMPL="main.mobile.html"
 
 
 app = Flask(__name__)
+#http = urllib.PoolManager()
 
 
 def loadconfig():
-  cfgstream = file(SCRIPTPATH + '/config.yaml')
+  cfgstream = open(SCRIPTPATH + '/config.yaml')
   config = yaml.load(cfgstream)
   return config
 
 def getfromurl(url):
-  ret = urllib2.urlopen(url).read()
+  with urllib.request.urlopen(url) as response:
+    ret = response.read().decode('utf-8')
   return ret
 
+def putsetting(key, value):
+  redisconnection.set(key, value)
+
+def getsetting(key):
+  return redisconnection.get(key)
 
 @app.route('/temp/<room>')
 def temp(room):
   config = loadconfig()
   try:
     temp = temperature().get(config['tempsensors'][room]['id']) 
-    print 'Temperature reading: ' + str(temp)
+    print ('Temperature reading: ' + str(temp))
   except:
     temp = "Unavailable"
 
@@ -51,20 +58,22 @@ def alltemp():
 
   for room in config['tempsensors']:
     sensorcfg = config['tempsensors'][room]
+#
+#    host = sensorcfg['host']
+#    friendlyname = sensorcfg['friendlyname']
+#    sensorid = sensorcfg['id']
+#    tempreading = getfromurl('http://' + host + ':5000/temp/' + room) #urllib.urlopen('http://' + host + ':5000/temp/' + room).read()
+#    sensorcfg['reading'] = tempreading
+#
+#    print (tempreading)
+    sensorcfg['reading'] = getsetting(room)
 
-    host = sensorcfg['host']
-    friendlyname = sensorcfg['friendlyname']
-    sensorid = sensorcfg['id']
-    tempreading = urllib2.urlopen('http://' + host + ':5000/temp/' + room).read()
-    sensorcfg['reading'] = tempreading
-
-    print tempreading
 
   for control in config['controls']:
     controlconfig = config['controls'][control]
 
     host = controlconfig['host']
-    controlstate = getcontrolstate(control) #urllib2.urlopen('http://' + host + ':5000/gpio/' + str(controlconfig['gpio'])).read()
+    controlstate = getcontrolstate(control) #urllib.urlopen('http://' + host + ':5000/gpio/' + str(controlconfig['gpio'])).read()
     controlconfig['state'] = controlstate
 
   return render_template(MOBILETMPL, sensors=config['tempsensors'], controls=config['controls'])
@@ -98,7 +107,7 @@ def getcontrolstate(control):
     reversed = True
 
   stateurl = 'http://' + host + ':5000/gpio/' + str(control['gpio'])
-  state = urllib2.urlopen(stateurl).read()
+  state = getfromurl(stateurl) #urllib.urlopen(stateurl).read()
 
   if reversed == True:
     if state == '1':
@@ -108,10 +117,10 @@ def getcontrolstate(control):
 
   return state
 
-@app.route('/control/<control>/<state>')
-def setcontrolstate(control, state):
+@app.route('/control/<controlname>/<state>')
+def setcontrolstate(controlname, state):
   config = loadconfig()
-  control = config['controls'][control]
+  control = config['controls'][controlname]
   host = control['host']
 
   if 'statusgpio' in control:
@@ -133,6 +142,8 @@ def setcontrolstate(control, state):
   if reversed == True:
     newstate = '0' if newstate == '1' else '1'
 
+  putsetting(controlname, newstate)
+
   return newstate
 
 @app.route('/togglecontrol/<control>')
@@ -149,7 +160,7 @@ def switchworker(gpioid, control):
 
   while True:
     gpio.wait_for_edge(gpioid, gpio.FALLING)
-    print "Button " + str(gpioid) + " for " + control + " pressed"
+    print ("Button " + str(gpioid) + " for " + control + " pressed")
     togglecontrol(control)
     time.sleep(0.25)
 
@@ -167,10 +178,36 @@ def createswitchworkers():
     for sw in hostswitches:
       t = Thread(target = switchworker, args = (hostswitches[sw]['gpio'], hostswitches[sw]['control']))
       t.start()
-      print "Switch worker thread started for " + hostswitches[sw]['control']
+      print ("Switch worker thread started for " + hostswitches[sw]['control'])
 
+
+def temperatureworker():
+  while True:
+    print("Getting temperatures...")
+    config = loadconfig()
+
+    for room in config['tempsensors']:
+      sensorcfg = config['tempsensors'][room]
+  
+      host = sensorcfg['host']
+      friendlyname = sensorcfg['friendlyname']
+      sensorid = sensorcfg['id']
+      tempreading = getfromurl('http://' + host + ':5000/temp/' + room) #urllib.urlopen('http://' + host + ':5000/temp/' + room).read()
+  
+      print("type=Temperature, sensor=" + room + ", reading=" + tempreading) 
+      putsetting(room, tempreading)
+
+    time.sleep(60)
+
+def createtemperatureworker():
+  t = Thread(target=temperatureworker)
+  t.start()
+  print ("Temperature worker thread started")
+
+redisconnection = redis.StrictRedis(host=loadconfig()['services']['redis']['host'], port=loadconfig()['services']['redis']['port'], db=0)
 
 if __name__ == '__main__':
 #  createswitchworkers()
+  createtemperatureworker()
   app.run(debug=True, host='0.0.0.0', threaded=True)
 
