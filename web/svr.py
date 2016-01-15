@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from flask import Flask
 from flask import request
@@ -15,6 +15,8 @@ import struct
 import os
 import time
 import redis
+import logging
+
 
 SCRIPTPATH=os.path.dirname(os.path.realpath(__file__))
 MOBILETMPL="main.mobile.html"
@@ -53,19 +55,10 @@ def temp(room):
 
 @app.route('/')
 def alltemp():
-  #room = 'understairs'
   config = loadconfig()
 
   for room in config['tempsensors']:
     sensorcfg = config['tempsensors'][room]
-#
-#    host = sensorcfg['host']
-#    friendlyname = sensorcfg['friendlyname']
-#    sensorid = sensorcfg['id']
-#    tempreading = getfromurl('http://' + host + ':5000/temp/' + room) #urllib.urlopen('http://' + host + ':5000/temp/' + room).read()
-#    sensorcfg['reading'] = tempreading
-#
-#    print (tempreading)
     sensorcfg['reading'] = getsetting(room)
 
 
@@ -80,19 +73,10 @@ def alltemp():
 
 @app.route('/gpio/<id>')
 def getgpiostate(id):
-  #gpio.setmode(gpio.BCM)
-  #gpionum = int(id)
-  #gpio.setup(gpionum, gpio.OUT)
-  #return str(gpio.input(gpionum))
   return str(pins().getpin(id))
 
 @app.route('/gpio/<id>/<state>')
 def setgpiostate(id, state):
-  #gpio.setmode(gpio.BCM)
-  #gpionum = int(id)
-  #gpio.setup(gpionum, gpio.OUT)
-  #gpio.output(gpionum, True if state == 'on' else False)
-  #return getgpiostate(id)
   pins().setpin(id, state)
   return str(pins().getpin(id))
 
@@ -193,8 +177,9 @@ def temperatureworker():
       friendlyname = sensorcfg['friendlyname']
       sensorid = sensorcfg['id']
       tempreading = getfromurl('http://' + host + ':5000/temp/' + room) #urllib.urlopen('http://' + host + ':5000/temp/' + room).read()
-  
-      print("type=Temperature, sensor=" + room + ", reading=" + tempreading) 
+
+      #print("type=Temperature, sensor=" + room + ", reading=" + tempreading)
+      logging.info("type=Temperature, sensor=" + room + ", reading=" + tempreading)
       putsetting(room, tempreading)
 
     time.sleep(60)
@@ -205,6 +190,9 @@ def createtemperatureworker():
   print ("Temperature worker thread started")
 
 redisconnection = redis.StrictRedis(host=loadconfig()['services']['redis']['host'], port=loadconfig()['services']['redis']['port'], db=0)
+logging.basicConfig(filename='/var/log/hasvr.log', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %H.%M.%S')
+
+logging.info('started')
 
 if __name__ == '__main__':
 #  createswitchworkers()
