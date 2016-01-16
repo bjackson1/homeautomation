@@ -32,8 +32,15 @@ def loadconfig():
   return config
 
 def getfromurl(url):
-  with urllib.request.urlopen(url) as response:
-    ret = response.read().decode('utf-8')
+  ret = ""
+
+  try:
+    with urllib.request.urlopen(url) as response:
+      ret = response.read().decode('utf-8')
+  except:
+    print("Error retrieving from " + url)
+    raise
+
   return ret
 
 def putsetting(key, value):
@@ -59,14 +66,21 @@ def alltemp():
 
   for room in config['tempsensors']:
     sensorcfg = config['tempsensors'][room]
-    sensorcfg['reading'] = getsetting(room)
+    try:
+      sensorcfg['reading'] = getsetting(room)
+    except:
+      sensorcfg['reading'] = "Unavailable"
 
 
   for control in config['controls']:
     controlconfig = config['controls'][control]
 
     host = controlconfig['host']
-    controlstate = getcontrolstate(control) #urllib.urlopen('http://' + host + ':5000/gpio/' + str(controlconfig['gpio'])).read()
+    try:
+      controlstate = getcontrolstate(control)
+    except:
+      controlstate = "Unavailable"
+
     controlconfig['state'] = controlstate
 
   return render_template(MOBILETMPL, sensors=config['tempsensors'], controls=config['controls'])
@@ -90,8 +104,13 @@ def getcontrolstate(control):
   if 'reversed' in control:
     reversed = True
 
+  state = "Unknown"
+
   stateurl = 'http://' + host + ':5000/gpio/' + str(control['gpio'])
-  state = getfromurl(stateurl) #urllib.urlopen(stateurl).read()
+  try:
+    state = getfromurl(stateurl)
+  except:
+    raise
 
   if reversed == True:
     if state == '1':
@@ -176,7 +195,10 @@ def temperatureworker():
       host = sensorcfg['host']
       friendlyname = sensorcfg['friendlyname']
       sensorid = sensorcfg['id']
-      tempreading = getfromurl('http://' + host + ':5000/temp/' + room) #urllib.urlopen('http://' + host + ':5000/temp/' + room).read()
+      try:
+        tempreading = getfromurl('http://' + host + ':5000/temp/' + room) #urllib.urlopen('http://' + host + ':5000/temp/' + room).read()
+      except:
+        tempreading = "Unavailable"
 
       #print("type=Temperature, sensor=" + room + ", reading=" + tempreading)
       logging.info("type=Temperature, sensor=" + room + ", reading=" + tempreading)
