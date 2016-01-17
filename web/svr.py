@@ -32,14 +32,8 @@ def loadconfig():
   return config
 
 def getfromurl(url):
-  ret = ""
-
-  try:
-    with urllib.request.urlopen(url) as response:
-      ret = response.read().decode('utf-8')
-  except:
-    print("Error retrieving from " + url)
-    raise
+  with urllib.request.urlopen(url, timeout=5) as response:
+    ret = response.read().decode('utf-8')
 
   return ret
 
@@ -110,13 +104,9 @@ def getcontrolstate(control):
   try:
     state = getfromurl(stateurl)
   except:
-    raise
+    state = "Unavailable"
 
-  if reversed == True:
-    if state == '1':
-      state = '0'
-    else:
-      state = '1'
+  state = '1' if reversed and state == '0' else ('0' if reversed and state == '1' else state)
 
   return state
 

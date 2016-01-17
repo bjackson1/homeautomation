@@ -28,7 +28,8 @@ class svr_gpiostates(unittest.TestCase):
       mock_method.assert_called_with(22, False)
  
 class svr_loadconfig(unittest.TestCase):
-  testconfig1 = {'tempsensors': {'test1': {'friendlyname': 'Test 1', 'host': '127.0.0.1', 'id': '28-000000000001'}, 'test2': {'friendlyname': 'Test 2', 'host': '127.0.0.1', 'id': '28-000000000002'}}, 'controls': {'landinglight': {'friendlyname': 'Landing Light', 'gpio': 21, 'host': '192.168.1.12'}, 'hotwater': {'friendlyname': 'Hot Water', 'gpio': 14, 'host': '127.0.0.1', 'reversed': True, 'statusgpio': 18}, 'centralheatingpump': {'host': '192.168.1.12', 'gpio': 15, 'friendlyname': 'Central Heating', 'statusgpio': 17, 'reversed': True, 'dependsupon': 'hotwater'}}}
+  testconfig1 = {'tempsensors': {'test1': {'friendlyname': 'Test 1', 'host': '127.0.0.1', 'id': '28-000000000001'}, 'test2': {'friendlyname': 'Test 2', 'host': '127.0.0.1', 'id': '28-000000000002'}}, 'controls': {'landinglight': {'friendlyname': 'Landing Light', 'gpio': 21, 'host': '192.168.1.12'}, 'hotwater': {'friendlyname': 'Hot Water', 'gpio': 14, 'host': '127.0.0.1', 'reversed': True, 'statusgpio': 18}, 'centralheatingpump': {'host': '192.168.1.12', 'gpio': 15, 'friendlyname': 'Central Heating', 'statusgpio': 17, 'reversed': True, 'dependsupon': 'hotwater'}, 'missing': {'host': '192.168.10.10', 'gpio': 15, 'friendlyname': 'Missing Control', 'statusgpio': 17, 'reversed': True}}}
+
   testconfig2 = {'tempsensors': {'livingroom': {'friendlyname': 'Living Room', 'host': '192.168.1.12', 'id': '28-0415a187aaff'}, 'heatingreturn': {'friendlyname': 'Central Heating Return', 'host': '192.168.1.12', 'id': '28-0315a1b026ff'}, 'hotwaterflow': {'friendlyname': 'Hot Water Flow', 'host': '192.168.1.12', 'id': '28-0315a1b006ff'}, 'test': {'friendlyname': 'Test Probe', 'host': 'localhost', 'id': '28-0315a1d297ff'}, 'hotwaterreturn': {'friendlyname': 'Hot Water Return', 'host': '192.168.1.12', 'id': '28-0315a1d21dff'}, 'loft': {'friendlyname': 'Loft', 'host': '192.168.1.2', 'id': '28-0315a1d259ff'}, 'heatingflow': {'friendlyname': 'Central Heating Flow', 'host': '192.168.1.12', 'id': '28-0315a1b011ff'}}, 'switches': {'hosts': {'testpi': {'testswitch2': {'control': 'testlight2', 'gpio': 18}, 'testswitch': {'control': 'landinglight', 'gpio': 17}}}}, 'controls': {'landinglight': {'friendlyname': 'Landing Light', 'gpio': 21, 'host': '192.168.1.12'}, 'hotwater': {'friendlyname': 'Hot Water', 'gpio': 14, 'host': '192.168.1.12', 'reversed': True, 'statusgpio': 18}, 'centralheatingpump': {'host': '192.168.1.12', 'gpio': 15, 'friendlyname': 'Central Heating', 'statusgpio': 17, 'reversed': True, 'dependsupon': 'hotwater'}}}
 
   def test_svr_getcontrolstate_WhenCalledWithNonReversedControlMockedToOn_WillReturn1(self):
@@ -63,6 +64,11 @@ class svr_loadconfig(unittest.TestCase):
       mock_getfromurl.assert_any_call(expectedurl1)
       mock_getfromurl.assert_any_call(expectedurl2)
       #self.assertEqual(1, 1)
+
+  def test_svr_getcontrolstate_WhenCalledAgainstControlNotAccessibleOnNetwork_WillReturnUnavailable(self):
+    with mock.patch('svr.loadconfig', return_value=self.testconfig1):
+      ret = svr.getcontrolstate('missing')
+      self.assertEqual('Unavailable', ret)
 
   def test_svr_togglecontrol_WhenCalledWithControlInOnState_WillSetControlToOff(self):
     with mock.patch('svr.loadconfig', return_value=self.testconfig1), mock.patch('svr.getcontrolstate', return_value='1') as mock_getcontrolstate, mock.patch('svr.setcontrolstate') as mock_setcontrolstate:
