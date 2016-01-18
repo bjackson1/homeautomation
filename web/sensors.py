@@ -1,7 +1,6 @@
 import networking
 import time
 from storage import redisclient
-from threading import Thread
 
 class temperaturesensor:
   def __init__(self, config):
