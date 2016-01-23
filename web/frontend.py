@@ -18,13 +18,22 @@ ctrl = controller()
 
 @app.route('/')
 def getdefault():
-    return ctrl.sensors['test'].get()
+    temps = {}
+    ctrls = {}
+
+    for s in ctrl.sensors:
+        temps[ctrl.sensors[s].id] = ctrl.sensors[s].get()
+
+    for c in ctrl.controls:
+        ctrls[ctrl.controls[c].id] = ctrl.controls[c].get()
+
+    return render_template('main.html', temps=temps, ctrls=ctrls)
 
 
 @app.route('/control/<id>')
 def getcontrol(id):
     if id in ctrl.controls:
-        return ctrl.controls[id].name
+        return ctrl.controls[id].get()
     else:
         return 'unknown control'
 
@@ -33,6 +42,7 @@ def getcontrol(id):
 def setcontrol(id, value):
     if id in ctrl.controls:
         ct = ctrl.controls[id]
+        ct.set(value)
         logging.info('Control=' + ct.id + ', Operation=set, value=' + value)
 
     return getcontrol(id)

@@ -1,0 +1,50 @@
+body {
+    font-family: "Lucida Sans Unicode";
+    margin: 0;
+    padding: 0;
+}
+
+table {
+    border: 0px solid #c0c0c0;
+    text-align: center;
+    font-size: 12px;
+}
+
+tr, td {
+    padding: 10px;
+}
+
+.headerbar {
+  background-color: black;
+  color: white;
+  height: 120px;
+  padding-left: 50px;
+  font-size: 250%;
+  font-weight: bold;
+  text-align: left;
+}
+
+.house_floor {
+    border: 1px solid #e0e0e0;
+    background-color: #c08040;
+    height: 350px;
+    width: 240px;
+    padding: 5px;
+}
+
+.room {
+    border: 1px dashed #e0e0c0;
+    background-color: #f8f8f0;
+    padding: 3px;
+}
+
+.temp {
+    font-weight: bold;
+    font-size: 32px;
+}
+
+.floor_label {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}

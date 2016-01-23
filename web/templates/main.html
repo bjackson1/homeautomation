@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<link rel="stylesheet" href="./static/default.css" type="text/css"/>
+<title>Home Control</title>
+<script src="{{ url_for('static', filename='lib.js') }}"></script>
+</head>
+
+<body>
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+<tr><td class="headerbar">
+
+Home Control
+
+</td></tr>
+</table>
+
+<table>
+    <tr>
+        <td><div class="floor_label">Downstairs</div>
+            <table id="downstairs" class="house_floor">
+                <tr>
+                    <td class="room" id="kitchen" colspan="2"></td>
+                    <td class="room" id="diningroom"></td>
+                </tr>
+
+                <tr>
+                    <td class="room" id="hall"></td>
+                    <td class="room" id="Lounge" colspan="2"><div class="temp">{{ temps['livingroom']|float|round(1) }}</div></td>
+                </tr>
+            </table>
+        </td>
+
+        <td><div class="floor_label">Upstairs</div>
+            <table id="upstairs" class="house_floor">
+                <tr>
+                    <td class="room" id="bathroom"></td>
+                    <td class="room" id="bedroom2"></td>
+                </tr>
+
+                <tr>
+                    <td class="room" id="hall"></td>
+                    <td class="room" id="bedroom1" rowspan="2"></td>
+                </tr>
+
+                <tr>
+                    <td class="room" id="bedroom3"></td>
+                </tr>
+            </table>        
+        </td>
+
+        <td><div class="floor_label">Loft</div>
+            <table id="loft" class="house_floor">
+                <tr>
+                    <td class="room" id="loftspace"><div class="temp">{{ temps['loft']|float|round(1) }}</div></td>
+                </tr>
+            </table> 
+        </td>
+    </tr>
+</table>
+
+<table class="boiler">
+    <tr>
+    <td rowspan="4"><img src="./static/boiler.png" height="300px"></td>
+    <td><div class="boiler_label">CH Flow</div><div class="temp">{{ temps['heatingflow']|float|round(1) }}</div></td>
+    <td rowspan="4"><img src="./static/hotwatertank.png" height="300px" style="padding-left: 50px; padding-top: 10px;"></td>
+    <td><div class="hotwater_label">Top</div><div class="temp">{{ temps['hotwatertanktop']|float|round(1) }}</div></td>
+    </tr>
+
+    <tr><td><div class="boiler_label">CH Return</div><div class="temp">{{ temps['heatingreturn']|float|round(1) }}</div></td><td><div class="hotwater_label">Middle</div><div class="temp">{{ temps['hotwatertankmiddle']|float|round(1) }}</div></td></tr>
+    <tr><td><div class="boiler_label">HW Flow</div><div class="temp">{{ temps['hotwaterflow']|float|round(1) }}</div></td><td><div class="hotwater_label">Bottom</div><div class="temp">{{ temps['hotwatertankbottom']|float|round(1) }}</div></td></tr>
+    <tr><td><div class="boiler_label">HW Return</div><div class="temp">{{ temps['hotwaterreturn']|float|round(1) }}</div></td></tr>
+
+    <tr>
+        <td colspan="2">
+            <a href="#!" id="lnkcentralheatingpump" onclick="setControlState('centralheatingpump', '{% if ctrls['centralheatingpump'] == 'on' %}off{% else %}on{% endif %}')"><img src="{{ url_for('static', filename = 'power_button_' + ctrls['centralheatingpump'] + '.png') }}" id="btncentralheatingpump" height=120 width=120></img></a>
+        </td>
+
+        <td colspan="2">
+            <a href="#!" id="lnkhotwater" onclick="setControlState('hotwater', '{% if ctrls['hotwater'] == 'on' %}off{% else %}on{% endif %}')"><img src="{{ url_for('static', filename = 'power_button_' + ctrls['hotwater'] + '.png') }}" id="btnhotwater" height=120 width=120></img></a>
+        </td>
+    </tr>
+</table>
+
+
+</body>
+</html>

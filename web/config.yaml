@@ -33,6 +33,18 @@ tempsensors:
     host: 192.168.1.193
     hardwareid: 28-0315a1d297ff
     name: Test Probe
+  hotwatertanktop:
+    host: 192.168.1.2
+    hardwareid: 28-0415a18b42ff
+    name: Hot Water Tank Top
+  hotwatertankmiddle:
+    host: 192.168.1.2
+    hardwareid: 28-0415a1ca05ff
+    name: Hot Water Tank Middle
+  hotwatertankbottom:
+    host: 192.168.1.2
+    hardwareid: 28-0415a18739ff
+    name: Hot Water Tank Bottom
 
 controls:
   hotwater:
