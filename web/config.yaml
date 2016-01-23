@@ -1,66 +1,66 @@
 ---
 services:
   redis:
-    host: 127.0.0.1
+    host: 192.168.1.2
     port: 6379
 
 tempsensors:
   loft:
     host: 192.168.1.2
-    id: 28-0315a1d259ff
-    friendlyname: Loft
+    hardwareid: 28-0315a1d259ff
+    name: Loft
   hotwaterflow:
     host: 192.168.1.12
-    id: 28-0315a1b006ff
-    friendlyname: Hot Water Flow
+    hardwareid: 28-0315a1b006ff
+    name: Hot Water Flow
   hotwaterreturn:
     host: 192.168.1.12
-    id: 28-0315a1d21dff
-    friendlyname: Hot Water Return
+    hardwareid: 28-0315a1d21dff
+    name: Hot Water Return
   heatingflow:
     host: 192.168.1.12
-    id: 28-0315a1b011ff
-    friendlyname: Central Heating Flow
+    hardwareid: 28-0315a1b011ff
+    name: Central Heating Flow
   heatingreturn:
     host: 192.168.1.12
-    id: 28-0315a1b026ff
-    friendlyname: Central Heating Return
+    hardwareid: 28-0315a1b026ff
+    name: Central Heating Return
   livingroom:
     host: 192.168.1.12
-    id: 28-0415a187aaff
-    friendlyname: Living Room
+    hardwareid: 28-0415a187aaff
+    name: Living Room
   test:
-    host: localhost
-    id: 28-0315a1d297ff
-    friendlyname: Test Probe
+    host: 192.168.1.193
+    hardwareid: 28-0315a1d297ff
+    name: Test Probe
 
 controls:
   hotwater:
     host: 192.168.1.12
-    gpio: 14
-    friendlyname: Hot Water
+    controlpin: 14
+    name: Hot Water
     reversed: true
-    statusgpio: 18
+    statuspin: 18
   centralheatingpump:
     host: 192.168.1.12
-    gpio: 15
-    friendlyname: Central Heating
+    controlpin: 15
+    name: Central Heating
     dependsupon: hotwater
     reversed: true
-    statusgpio: 17    
+    statuspin: 17    
   landinglight:
     host: 192.168.1.12
-    gpio: 21
-    friendlyname: Landing Light
+    controlpin: 21
+    name: Landing Light
 
 switches:
   hosts:
     testpi:
       testswitch:
-        gpio: 17
+        controlpin: 17
         control: landinglight
       testswitch2:
-        gpio: 18
+        controlpin: 18
         control: testlight2
 
 
