@@ -29,14 +29,14 @@ class storageintegrationtests(unittest.TestCase):
     def test_setandgetasint_WhenCalledWithMockKeyValue_WillCallRedisSetWithValues(self):
         cfg = self.testIntegrationConfig
         r = redisclient(cfg['host'], cfg['port'])
-        r.set('wibble', 123)
-        self.assertEqual(123, r.getasint('wibble'))
+        redisclient.set('wibble', 123)
+        self.assertEqual(123, redisclient.getasint('wibble'))
 
     def test_setandgetasstring_WhenCalledWithMockKeyValue_WillCallRedisSetWithValues(self):
         cfg = self.testIntegrationConfig
         r = redisclient(cfg['host'], cfg['port'])
-        r.set('wibble', 'abc')
-        self.assertEqual('abc', r.getasstring('wibble'))
+        redisclient.set('wibble', 'abc')
+        self.assertEqual('abc', redisclient.getasstring('wibble'))
 
 
 if __name__ == '__main__':

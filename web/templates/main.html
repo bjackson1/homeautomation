@@ -83,6 +83,42 @@ Home Control
     </tr>
 </table>
 
+<script>
+
+var x = document.getElementsByClassName("room");
+
+for (r in x) {
+    var c = x[r];
+
+    if (typeof c.innerText != 'undefined' && c.innerText.length > 0) {
+        var v = parseFloat(c.innerText);
+
+        if (v > 23) {
+            c.style.backgroundColor = 'red';
+            c.style.color = 'white';
+        }
+        else if (v > 21) {
+            c.style.backgroundColor = 'orangered';
+            c.style.color = 'white';
+        }
+        else if (v > 19) {
+            c.style.backgroundColor = 'orange';
+            c.style.color = 'white';
+
+        }
+        else if (v > 17) {
+            c.style.backgroundColor = 'purple';
+            c.style.color = 'white';
+       }
+        else {
+            c.style.backgroundColor = 'blue';
+            c.style.color = 'white';
+        }
+    }
+}
+
+</script>
+
 
 </body>
 </html>

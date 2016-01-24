@@ -17,8 +17,8 @@ class controlunittests(unittest.TestCase):
                                'host': '127.0.0.1', 'controlpin': '28',
                                'reversed': True}
     testConfigRemoteControl1 = {'name': 'Test Control 2',
-                                'host': '10.20.30.40',
-                                'id': '28-000000000001'}
+                                'host': '10.20.30.40', 'controlpin': '28',
+                               'reversed': True}
 
     # Positive tests for basic class functionality
     def test_init_WhenCalledWithLocalHostAddress_SetsExpectedPropertiesOnCreatedClass(self):
@@ -41,7 +41,7 @@ class controlunittests(unittest.TestCase):
         self.assertEqual(True, c.reversed)
 
     def test_set_WhenCalledWithOnAndNonReversedStatus_SetsGPIOPinToOne(self):
-        with mock.patch('storage.redisclient.set') as mocked_redis, mock.patch('RPi.GPIO.output') as mocked_rpi:
+        with mock.patch('storage.redisclient.set') as mocked_redis, mock.patch('storage.redisclient.getasstring', return_value='on') as mocked_redis_get, mock.patch('RPi.GPIO.output') as mocked_rpi:
             cfg = self.testConfigLocalControl1
             c = control('test1', cfg)
             c.set('on')
@@ -49,7 +49,7 @@ class controlunittests(unittest.TestCase):
             mocked_rpi.assert_called_with(28, 1)
 
     def test_set_WhenCalledWithOnAndReversedStatus_SetsGPIOPinToZero(self):
-        with mock.patch('storage.redisclient.set') as mocked_redis, mock.patch('RPi.GPIO.output') as mocked_rpi:
+        with mock.patch('storage.redisclient.set') as mocked_redis, mock.patch('storage.redisclient.getasstring', return_value='on') as mocked_redis_get, mock.patch('RPi.GPIO.output') as mocked_rpi:
             cfg = self.testConfigLocalControl3
             c = control('test1', cfg)
             c.set('on')
@@ -57,13 +57,21 @@ class controlunittests(unittest.TestCase):
             mocked_rpi.assert_called_with(28, 0)
 
     def test_set_WhenCalledWithOffAndNonReversedNoStatusItem_SetsGPIOPinToZeroAndStatusPinToZero(self):
-        with mock.patch('storage.redisclient.set') as mocked_redis, mock.patch('RPi.GPIO.output') as mocked_rpi:
+        with mock.patch('storage.redisclient.set') as mocked_redis_set, mock.patch('storage.redisclient.getasstring', return_value='off') as mocked_redis_get, mock.patch('RPi.GPIO.output') as mocked_rpi:
             cfg = self.testConfigLocalControl2
             c = control('test1', cfg)
             c.set('off')
-            mocked_redis.assert_called_with('test1', 'off')
+            mocked_redis_set.assert_called_with('test1', 'off')
             mocked_rpi.assert_any_call(28, 0)
             mocked_rpi.assert_any_call(14, 0)
+
+    def test_set_WhenCalledWithOffAndNonReversedNoStatusItemRemote_SetsRedisAndCallsURL(self):
+        with mock.patch('storage.redisclient.set') as mocked_redis_set, mock.patch('request.getfromurl') as mocked_request:
+            cfg = self.testConfigRemoteControl1
+            c = control('test1', cfg)
+            c.set('off')
+            mocked_redis_set.assert_called_with('test1', 'off')
+            mocked_request.assert_called_with('http://' + cfg['host'] + ':5000/control/test1/off')
 
 
 if __name__ == '__main__':
