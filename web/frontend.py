@@ -66,6 +66,7 @@ def gettemps():
 
     for sensor in ctrl.sensors:
         output = ('Type=Temperature, sensor=' + sensor + ', reading=' + str(ctrl.sensors[sensor].get()))
+        logging.info(output)
 
         ret = ret + output + '\n'
 
