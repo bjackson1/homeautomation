@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+import sys
+
+sys.path.append('/var/www/homeautomation/web')
+
 from flask import Flask
 from flask import request
 from flask import render_template
@@ -12,11 +16,11 @@ import logging
 
 
 MOBILETMPL = "main.mobile.html"
-app = Flask(__name__)
+application = Flask(__name__)
 ctrl = controller()
 
 
-@app.route('/')
+@application.route('/')
 def getdefault():
     temps = {}
     ctrls = {}
@@ -30,7 +34,7 @@ def getdefault():
     return render_template('main.html', temps=temps, ctrls=ctrls)
 
 
-@app.route('/control/<id>')
+@application.route('/control/<id>')
 def getcontrol(id):
     if id in ctrl.controls:
         return ctrl.controls[id].get()
@@ -38,7 +42,7 @@ def getcontrol(id):
         return 'unknown control'
 
 
-@app.route('/control/<id>/<value>')
+@application.route('/control/<id>/<value>')
 def setcontrol(id, value):
     if id in ctrl.controls:
         ct = ctrl.controls[id]
@@ -48,7 +52,7 @@ def setcontrol(id, value):
     return getcontrol(id)
 
 
-@app.route('/sensor/<id>')
+@application.route('/sensor/<id>')
 def getsensor(id):
     if id in ctrl.sensors:
         return ctrl.sensors[id].get()
@@ -63,4 +67,4 @@ logging.info('started')
 
 if __name__ == '__main__':
     #ctrl = controller()
-    app.run(debug=True, host='0.0.0.0', threaded=True)
+    application.run(debug=True, host='0.0.0.0', threaded=True)

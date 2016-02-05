@@ -1,3 +1,8 @@
+
+import sys
+
+sys.path.append('/var/www/homeautomation/web')
+
 from control import control
 import sensors
 from config import config

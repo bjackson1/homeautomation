@@ -19,6 +19,11 @@ function setControlState(control, state) {
     }};
   xhttp.open("GET", "/control/" + control + "/" + state, true);
   xhttp.send();
+
+  if (control == 'centralheatingpump')
+  {
+    setControlState('hotwater', state);
+  }
   
   return false;
 }

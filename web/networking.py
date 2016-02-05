@@ -1,3 +1,8 @@
+
+import sys
+
+sys.path.append('/var/www/homeautomation/web')
+
 from netifaces import interfaces, ifaddresses, AF_INET
 
 

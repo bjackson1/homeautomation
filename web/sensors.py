@@ -1,3 +1,8 @@
+
+import sys
+
+sys.path.append('/var/www/homeautomation/web')
+
 import networking
 import time
 from storage import redisclient

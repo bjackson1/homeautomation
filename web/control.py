@@ -1,3 +1,8 @@
+
+import sys
+
+sys.path.append('/var/www/homeautomation/web')
+
 import RPi.GPIO as gpio
 import networking
 import time
