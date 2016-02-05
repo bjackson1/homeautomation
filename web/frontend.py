@@ -60,6 +60,17 @@ def getsensor(id):
         return 'unknown sensor'
 
 
+@application.route('/logtemps')
+def gettemps():
+    ret = 'Logging readings...\n'
+
+    for sensor in ctrl.sensors:
+        output = ('Type=Temperature, sensor=' + sensor + ', reading=' + str(ctrl.sensors[sensor].get()))
+
+        ret = ret + output + '\n'
+
+    return ret
+
 logging.basicConfig(filename='/var/log/hasvr.log', level=logging.DEBUG,
                     format='%(asctime)s %(message)s', datefmt='%Y/%m/%d %H.%M.%S')
 
